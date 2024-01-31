@@ -1,6 +1,6 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
-export async function fetchAdvertsData() {
+export async function fetchAdvertsData(advertsToIgnore: Array<ObjectId>) {
   let currAdvert = undefined;
 
   const uri = process.env.MONGO_URI;
@@ -31,6 +31,7 @@ export async function fetchAdvertsData() {
 
     currAdvert = await collection.findOne({
       campaignId: { $exists: true },
+      _id: { $nin: advertsToIgnore },
     });
 
     if (currAdvert) {

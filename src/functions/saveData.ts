@@ -4,7 +4,7 @@ export async function saveMigrationInfo(oldAdvert: any, newAdvert: any) {
   const uri = process.env.MONGO_URI;
   const client = new MongoClient(uri);
   const database = client.db(process.env.DB_NAME);
-  const collection = database.collection('advertsMigration');
+  const collection = database.collection('adverts.migration');
 
   try {
     await client.connect();
@@ -19,6 +19,27 @@ export async function saveMigrationInfo(oldAdvert: any, newAdvert: any) {
           newCreativeId: creative.creativeId,
         };
       }),
+    });
+
+    return;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
+
+export async function saveMigrationError(errorAdvert: any, message: string) {
+  const uri = process.env.MONGO_URI;
+  const client = new MongoClient(uri);
+  const database = client.db(process.env.DB_NAME);
+  const collection = database.collection('adverts.migration');
+
+  try {
+    await client.connect();
+    await collection.insertOne({
+      errorAdvert: errorAdvert,
+      message: message,
     });
 
     return;
@@ -57,14 +78,14 @@ export async function saveUpdatedLogs(updatedLogs: any) {
   const database = client.db(process.env.DB_NAME);
   const collection = database.collection('banners.token.v2');
 
-  const parallelPromisesQuantity = 10;
-  const subArrays = splitIntoSubArrays(updatedLogs, parallelPromisesQuantity);
+  const batchSize = 50;
+  const subArrays = splitIntoSubArrays(updatedLogs, batchSize);
 
   try {
     await client.connect();
 
-    for (const subArray of subArrays) {
-      await Promise.all(
+    const updatePromises = subArrays.map(async (subArray: any) => {
+      return Promise.all(
         subArray.map(async (log: any) => {
           return collection.updateOne(
             {
@@ -79,7 +100,9 @@ export async function saveUpdatedLogs(updatedLogs: any) {
           );
         }),
       );
-    }
+    });
+
+    await Promise.all(updatePromises);
   } catch (e) {
     console.error(e);
   } finally {
