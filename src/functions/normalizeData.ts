@@ -6,7 +6,7 @@ export function normalizeAdvert(oldAdvert: any) {
     creatives: oldAdvert.creatives.map((oldCreative: any) => {
       const updatedCreative = {
         ...oldCreative,
-        creativeId: new ObjectId(),
+        _id: new ObjectId(),
       };
 
       if (!!updatedCreative.id) {
@@ -47,12 +47,8 @@ export function normalizeLogs(logs: any, migrationReference: any) {
   return logs.map((log: any) => {
     const updatedCreativeInfo = {
       ...log.creative,
-      creativeId: migrationRefDictionary[log.creative.id],
+      id: migrationRefDictionary[log.creative.id],
     };
-
-    if (!!updatedCreativeInfo.id) {
-      delete updatedCreativeInfo.id;
-    }
 
     return {
       ...log,

@@ -16,7 +16,7 @@ export async function saveMigrationInfo(oldAdvert: any, newAdvert: any) {
       creatives: newAdvert.creatives.map((creative: any, index: number) => {
         return {
           oldCreativeId: oldAdvert.creatives[index].id,
-          newCreativeId: creative.creativeId,
+          newCreativeId: creative._id,
         };
       }),
     });

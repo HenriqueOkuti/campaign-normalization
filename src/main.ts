@@ -37,7 +37,7 @@ async function main() {
       creatives: normalizedAdvert.creatives.map((creative: any, index: number) => {
         return {
           oldCreativeId: foundOldAdvert.creatives[index].id,
-          newCreativeId: creative.creativeId,
+          newCreativeId: creative._id,
         };
       }),
     };

@@ -49,7 +49,7 @@ export async function fetchLogsData(migrationReference: any) {
   const uri = process.env.MONGO_URI;
   const client = new MongoClient(uri);
 
-  const logsToProcessSize = 50000;
+  const logsToProcessSize = 100000;
 
   try {
     await client.connect();
@@ -61,8 +61,8 @@ export async function fetchLogsData(migrationReference: any) {
       .find(
         {
           campaignId: migrationReference.oldCampaignId,
-          'creatives.id': {
-            $in: migrationReference.creatives.map((creative: any) => creative.id),
+          'creative.id': {
+            $in: migrationReference.creatives.map((creative: any) => creative.oldCreativeId),
           },
         },
         { limit: logsToProcessSize },
