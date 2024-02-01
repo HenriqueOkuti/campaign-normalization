@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, AnyBulkWriteOperation } from 'mongodb';
 
 export async function saveMigrationInfo(oldAdvert: any, newAdvert: any) {
   const uri = process.env.MONGO_URI;
@@ -23,6 +23,7 @@ export async function saveMigrationInfo(oldAdvert: any, newAdvert: any) {
 
     return;
   } catch (e) {
+    console.log('Error saving migration info');
     console.error(e);
   } finally {
     await client.close();
@@ -44,6 +45,7 @@ export async function saveMigrationError(errorAdvert: any, message: string) {
 
     return;
   } catch (e) {
+    console.log('Error saving migration error');
     console.error(e);
   } finally {
     await client.close();
@@ -66,6 +68,7 @@ export async function saveUpdatedAdvert(updatedAdvert: any) {
       updatedAdvert,
     );
   } catch (e) {
+    console.log('Error saving updated advert');
     console.error(e);
   } finally {
     await client.close();
@@ -78,42 +81,26 @@ export async function saveUpdatedLogs(updatedLogs: any) {
   const database = client.db(process.env.DB_NAME);
   const collection = database.collection('banners.token.v2');
 
-  const batchSize = 50;
-  const subArrays = splitIntoSubArrays(updatedLogs, batchSize);
-
   try {
     await client.connect();
 
-    const updatePromises = subArrays.map(async (subArray: any) => {
-      return Promise.all(
-        subArray.map(async (log: any) => {
-          return collection.updateOne(
-            {
-              _id: log._id,
-            },
-            {
-              $set: {
-                campaignId: log.campaignId,
-                creative: log.creative,
-              },
-            },
-          );
-        }),
-      );
-    });
+    const bulkOperations: AnyBulkWriteOperation<any>[] = updatedLogs.map((log: any) => ({
+      updateOne: {
+        filter: { _id: log._id },
+        update: {
+          $set: {
+            campaignId: log.campaignId,
+            creative: log.creative,
+          },
+        },
+      },
+    }));
 
-    await Promise.all(updatePromises);
+    await collection.bulkWrite(bulkOperations);
   } catch (e) {
+    console.log('Error saving updated logs');
     console.error(e);
   } finally {
     await client.close();
   }
-}
-
-function splitIntoSubArrays(array: any, size: number) {
-  const subArrays = [];
-  for (let i = 0; i < array.length; i += size) {
-    subArrays.push(array.slice(i, i + size));
-  }
-  return subArrays;
 }

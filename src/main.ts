@@ -29,7 +29,7 @@ async function main() {
 
     const normalizedAdvert = normalizeAdvert(foundOldAdvert);
 
-    await saveMigrationInfo(foundOldAdvert, normalizedAdvert);
+    saveMigrationInfo(foundOldAdvert, normalizedAdvert);
 
     const migrationReference = {
       oldCampaignId: foundOldAdvert.campaignId,

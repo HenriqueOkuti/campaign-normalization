@@ -38,6 +38,7 @@ export async function fetchAdvertsData(advertsToIgnore: Array<ObjectId>) {
       return currAdvert;
     }
   } catch (e) {
+    console.log('Error fetching advert data');
     console.error(e);
   } finally {
     await client.close();
@@ -70,6 +71,7 @@ export async function fetchLogsData(migrationReference: any) {
 
     return logs;
   } catch (e) {
+    console.log('Error fetching logs data');
     console.error(e);
   } finally {
     await client.close();
