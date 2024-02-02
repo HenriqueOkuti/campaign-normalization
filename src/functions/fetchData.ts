@@ -6,7 +6,7 @@ export async function fetchAdvertsData(advertsToIgnore: Array<ObjectId>) {
   const uri = process.env.MONGO_URI;
   const client = new MongoClient(uri);
 
-  const advertsPriority = [{ campaignId: 6875505 }, { campaignId: 6875100 }];
+  const advertsPriority = [{ campaignId: 6875505 }];
 
   try {
     await client.connect();

@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { loadEnv } from './config/config';
 import { fetchAdvertsData, fetchLogsData } from './functions/fetchData';
 import { normalizeAdvert, normalizeLogs, validToNormalizeAdvert } from './functions/normalizeData';
@@ -6,7 +7,7 @@ import { saveMigrationError, saveMigrationInfo, saveUpdatedAdvert, saveUpdatedLo
 async function main() {
   console.log('Running script');
   const startTime = new Date().getTime();
-  const advertsToIgnore = [];
+  const advertsToIgnore = [new ObjectId('6528736489cc5c327b544e7a')];
 
   let noMoreData = false;
 
