@@ -31,6 +31,7 @@ async function main() {
     const normalizedAdvert = normalizeAdvert(foundOldAdvert);
 
     saveMigrationInfo(foundOldAdvert, normalizedAdvert);
+    await saveUpdatedAdvert(normalizedAdvert);
 
     const migrationReference = {
       oldCampaignId: foundOldAdvert.campaignId,
@@ -42,6 +43,13 @@ async function main() {
         };
       }),
     };
+
+    console.log(
+      'Executing migration for campaign: ',
+      migrationReference.oldCampaignId,
+      'to',
+      migrationReference.newCampaignId,
+    );
 
     while (!finishedMigratingCampaign) {
       const foundLogs = await fetchLogsData(migrationReference);
@@ -58,8 +66,6 @@ async function main() {
       const normalizedLogs = normalizeLogs(foundLogs, migrationReference);
       await saveUpdatedLogs(normalizedLogs);
     }
-
-    await saveUpdatedAdvert(normalizedAdvert);
   }
 
   console.log('Finished script');
