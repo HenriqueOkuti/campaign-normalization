@@ -77,3 +77,29 @@ export async function fetchLogsData(migrationReference: any) {
     await client.close();
   }
 }
+
+export async function fetchMigrationData() {
+  const uri = process.env.MONGO_URI;
+  const client = new MongoClient(uri);
+
+  try {
+    await client.connect();
+
+    const database = client.db(process.env.DB_NAME);
+    const collection = database.collection('adverts.migration');
+
+    // const migrationData = await collection.findOne({ migrated: { $exists: false }});
+    const migrationData = await collection.findOneAndUpdate(
+      { migrated: { $exists: false }, migrating: { $exists: false } },
+      { $set: { migrating: true } },
+      { returnDocument: 'after' },
+    );
+
+    return migrationData;
+  } catch (e) {
+    console.log('Error fetching migration data');
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}

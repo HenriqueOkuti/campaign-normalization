@@ -104,3 +104,31 @@ export async function saveUpdatedLogs(updatedLogs: any) {
     await client.close();
   }
 }
+
+export async function saveMigratedInfo(migrationData: any, status: boolean) {
+  const uri = process.env.MONGO_URI;
+  const client = new MongoClient(uri);
+  const database = client.db(process.env.DB_NAME);
+  const collection = database.collection('adverts.migration');
+
+  try {
+    await client.connect();
+
+    await collection.updateOne(
+      {
+        _id: migrationData._id,
+      },
+      {
+        $set: {
+          migrated: status,
+          migrating: false,
+        },
+      },
+    );
+  } catch (e) {
+    console.log('Error saving migrated info');
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
