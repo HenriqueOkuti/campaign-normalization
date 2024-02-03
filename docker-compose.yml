@@ -6,4 +6,4 @@ services:
       context: .
       dockerfile: Dockerfile
     deploy:
-      replicas: 6
+      replicas: 10

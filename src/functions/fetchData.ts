@@ -90,7 +90,7 @@ export async function fetchMigrationData() {
 
     // const migrationData = await collection.findOne({ migrated: { $exists: false }});
     const migrationData = await collection.findOneAndUpdate(
-      { migrated: { $exists: false }, migrating: { $exists: false } },
+      { $or: [{ migrated: { $exists: false } }, { migrated: false }], migrating: { $exists: false } },
       { $set: { migrating: true } },
       { returnDocument: 'after' },
     );
